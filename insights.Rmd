@@ -1,0 +1,120 @@
+---
+title: "Project"
+output: html_notebook
+---
+
+
+
+```{r}
+rm(list=ls())
+ls()
+
+setwd(getwd()) 
+```
+
+load csv
+```{r}
+dataset <- read.csv("Major_Crime_Indicators.csv")
+
+```
+
+insights
+Most frequent crime of all times
+Match works as the map function it collects the rows of the unique categories in the given column
+tabulate then counts the number of rows for each category 
+which.max gets the max category
+```{r}
+  uniqx <- unique(na.omit(dataset$mci_category))
+  uniqx[which.max(tabulate(match(dataset$mci_category, uniqx)))]
+```
+ 
+ The graph shows that assault is the most frequent type of crime of all times
+ 
+```{r}
+uniqx
+counts<-tabulate(match(dataset$mci_category, uniqx))
+barplot(counts, main = "Total crimes for each category", names.arg = uniqx, 
+                          xlab = "Category type", ylab = "Total number", 
+                          col = "red")
+```
+```{r}
+theft_over_rows<-dataset[dataset$mci_category == 'Theft Over',]
+theft_over_offence<-unique(na.omit(theft_over_rows$offence))
+theft_over_offence[2]
+counts<-tabulate(match(theft_over_rows$offence, theft_over_offence))
+#par(mar = c(10, 4, 10, 1)) 
+barplot(counts, main = "Total for different categories of Theft Over ", names.arg = theft_over_offence, 
+                          xlab = "Category type", ylab = "Total number", 
+                          col = "blue", las = 2)
+```
+```{r}
+theft_over_rows<-dataset[dataset$mci_category == 'Auto Theft',]
+theft_over_offence<-unique(na.omit(theft_over_rows$offence))
+theft_over_offence
+```
+Assault insights
+
+```{r}
+theft_over_rows<-dataset[dataset$mci_category == 'Assault',]
+theft_over_offence<-unique(na.omit(theft_over_rows$offence))
+theft_over_offence[2]
+counts<-tabulate(match(theft_over_rows$offence, theft_over_offence))
+#par(mar = c(10, 4, 10, 1)) 
+barplot(counts, main = "Total for different categories of Assault", names.arg = theft_over_offence, 
+                          xlab = "Category type", ylab = "Total number", 
+                          col = "blue", las = 2)
+```
+Neighbourhood insights
+
+Most dangerous Neighborhood analysis
+Waterfront Communities-The Island is the most unsafe place
+```{r}
+  Neighbour <- unique(na.omit(dataset$Neighbourhood))
+
+  most_dangerous_n<-Neighbour[which.max(tabulate(match(dataset$Neighbourhood, Neighbour)))]
+```
+
+Waterfront Communities-The Island insights
+Assault is the most frequent type of crime in the most dangerous neighborhood
+```{r}
+neighbor_analysis<-dataset[dataset$Neighbourhood == most_dangerous_n,]
+neighbor_crimes<-unique(na.omit(neighbor_analysis$mci_category))
+counts<-tabulate(match(neighbor_analysis$mci_category, neighbor_crimes))
+pie(c(counts),labels=paste(neighbor_crimes,round(100*counts/sum(counts),0),"%"),col=c("blue","red","yellow","green","pink","magenta","gray"),main=paste("Crime Analysis",most_dangerous_n)) 
+```
+Least Dangerous neighborhood analysis
+```{r}
+ least_dangerous_n<-Neighbour[which.min(tabulate(match(dataset$Neighbourhood, Neighbour)))]
+neighbor_analysis<-dataset[dataset$Neighbourhood == least_dangerous_n,]
+neighbor_crimes<-unique(na.omit(neighbor_analysis$mci_category))
+counts<-tabulate(match(neighbor_analysis$mci_category, neighbor_crimes))
+typeof(counts)
+pie(c(counts),labels=paste(neighbor_crimes,round(100*counts/sum(counts),0),"%"),col=c("blue","red","yellow","green","pink","magenta","gray"),main=paste("Crime Analysis",least_dangerous_n)) 
+```
+Crime Rate over Years from 2014-2022
+As the graph shows the crime rate kept increasing from 2014 till 2019 
+2019 was the peak
+then the rate dropped until now, this means that the police station implemented better security precautions
+```{r}
+years <- unique(na.omit(dataset$reportedyear))
+years[which.max(tabulate(match(dataset$reportedyear, years)))]
+
+count<-tabulate(match(dataset$reportedyear, years))
+plot(count,type = "o", col = "red", xlab = "Years", ylab = "Crime Number",
+     main = "Crimes rate across the years", x=years)
+```
+Crime rate analysis of months
+```{r}
+months <- unique(na.omit(dataset$reportedmonth))
+months
+
+count<-tabulate(match(dataset$reportedmonth, months))
+count
+#plot(y=count,type = "o", col = "red", xlab = "Years", ylab = "Rain fall", main = "Crimes rate across months of all years", x=months,xlim=c(1,12))
+
+library(ggplot2)
+ggplot(mapping= aes(x=months, y=count, group=0)) +geom_line()+geom_point()+geom_line()+ggtitle("Crimes across all months")
+# Second variable
+
+```
+
