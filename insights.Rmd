@@ -113,8 +113,12 @@ count
 #plot(y=count,type = "o", col = "red", xlab = "Years", ylab = "Rain fall", main = "Crimes rate across months of all years", x=months,xlim=c(1,12))
 
 library(ggplot2)
-ggplot(mapping= aes(x=months, y=count, group=0)) +geom_line()+geom_point()+geom_line()+ggtitle("Crimes across all months")
+#ggplot(mapping= aes(x=months, y=count, group=0)) +geom_line()+geom_point()+geom_line()+ggtitle("Crimes across all months")
 # Second variable
+plot(y=count,type = "o", col = "red", xlab = "Months", ylab = "Crime Number",
+     main = "Crimes rate across the years", x=c(1,2,3,4,5,6,7,8,9,10,11,12))
+
+# #Now the p contains a plot 
 
 ```
 
