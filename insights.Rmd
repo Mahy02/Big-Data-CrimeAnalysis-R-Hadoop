@@ -43,9 +43,10 @@ theft_over_offence<-unique(na.omit(theft_over_rows$offence))
 theft_over_offence[2]
 counts<-tabulate(match(theft_over_rows$offence, theft_over_offence))
 #par(mar = c(10, 4, 10, 1)) 
-barplot(counts, main = "Total for different categories of Theft Over ", names.arg = theft_over_offence, 
-                          xlab = "Category type", ylab = "Total number", 
-                          col = "blue", las = 2)
+barplot(counts, main = "Total for different categories of Theft Over ", names.arg = theft_over_offence, xlab = "Category type", ylab = "Total number", col = "blue", las = 2)
+df<-data.frame(counts,theft_over_offence)
+p<-ggplot(data=df, aes(x=theft_over_offence, y=counts,fill=counts))+geom_bar(stat="identity")  +scale_x_discrete(labels = wrap_format(10))+geom_text(aes(label = counts), vjust = 0)
+p
 ```
 ```{r}
 theft_over_rows<-dataset[dataset$mci_category == 'Auto Theft',]
@@ -63,7 +64,15 @@ counts<-tabulate(match(theft_over_rows$offence, theft_over_offence))
 barplot(counts, main = "Total for different categories of Assault", names.arg = theft_over_offence, 
                           xlab = "Category type", ylab = "Total number", 
                           col = "blue", las = 2)
+
+library(ggplot2)
+library(scales)
+df <- data.frame(counts, theft_over_offence)
+options(repr.plot.width = 500, repr.plot.height =3)
+p<-ggplot(data=df, aes(x=theft_over_offence, y=counts,fill=counts))+geom_bar(stat="identity")  +scale_x_discrete(labels = wrap_format(5))+geom_text(aes(label = counts), vjust = 0)
+p
 ```
+
 Neighbourhood insights
 
 Most dangerous Neighborhood analysis
