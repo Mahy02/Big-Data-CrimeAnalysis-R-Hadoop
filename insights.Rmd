@@ -16,6 +16,58 @@ load csv
 ```{r}
 dataset <- read.csv("Major_Crime_Indicators.csv")
 
+anyNA(dataset$mci_category)
+anyNA(dataset$reportedday)
+anyNA(dataset$reportedyear)
+anyNA(dataset$reportedmonth)
+anyNA(dataset$reportedhour)
+anyNA(dataset$offence)
+anyNA(dataset$Neighbourhood)
+anyNA(dataset$premises_type)
+anyNA(dataset$occurrenceday)
+anyNA(dataset$occurrencehour)
+anyNA(dataset$occurrencemonth)
+anyNA(dataset$occurrenceyear)
+anyNA(dataset$occurrencedate)
+
+#=========================Filling missing value====================================
+date_year<-c(dataset$occurrencedate[is.na(dataset$occurrenceyear)])
+#filling missing data in occurrence year from the column occurrence date
+dataset$occurrenceyear[is.na(dataset$occurrenceyear)]<-substr(date_year,1,4)
+#checking that they are all filled
+anyNA(dataset$occurrenceyear)
+levels(factor(dataset$occurrenceyear))
+date_day<-c(dataset$occurrencedate[is.na(dataset$occurrenceday)])
+
+#filling missing data in occurrence day from the column occurrence date
+dataset$occurrenceday[is.na(dataset$occurrenceday)]<-substr(date_day,9,10)
+#checking that they are all filled
+anyNA(dataset$occurrenceday)
+levels(factor(dataset$occurrenceday))
+
+date_month<-c(dataset$occurrencedate[dataset$occurrencemonth==""])
+
+substr(date_month[1],6,7)
+#filling missing data in occurrence day from the column occurrence date
+dataset$occurrencemonth[dataset$occurrencemonth==""]<-substr(date_month,6,7)
+levels(factor(dataset$occurrencemonth))
+dataset$occurrencemonth[which(dataset$occurrencemonth=="January")] <- "1"
+dataset$occurrencemonth[which(dataset$occurrencemonth=="February")] <- "2"
+dataset$occurrencemonth[which(dataset$occurrencemonth=="March")] <- "3"
+dataset$occurrencemonth[which(dataset$occurrencemonth=="April")] <- "4"
+dataset$occurrencemonth[which(dataset$occurrencemonth=="May")] <- "5"
+dataset$occurrencemonth[which(dataset$occurrencemonth=="June")] <- "6"
+dataset$occurrencemonth[which(dataset$occurrencemonth=="July")] <- "7"
+dataset$occurrencemonth[which(dataset$occurrencemonth=="August")] <- "8"
+dataset$occurrencemonth[which(dataset$occurrencemonth=="September")] <- "9"
+dataset$occurrencemonth[which(dataset$occurrencemonth=="October")] <- "10"
+dataset$occurrencemonth[which(dataset$occurrencemonth=="November")] <- "11"
+dataset$occurrencemonth[which(dataset$occurrencemonth=="December")] <- "12"
+dataset$occurrencemonth <- as.numeric(dataset$occurrencemonth)
+levels(factor(dataset$occurrencemonth))
+
+moode <- unique(na.omit(dataset$occurrencedayofweek))
+dataset$occurrencedayofweek[(dataset$occurrencedayofweek == "")] <- moode[which.max(tabulate(match(dataset$occurrencedayofweek, moode)))]
 ```
 
 insights
@@ -37,6 +89,8 @@ barplot(counts, main = "Total crimes for each category", names.arg = uniqx,
                           xlab = "Category type", ylab = "Total number", 
                           col = "red")
 ```
+Total crimes for different categories of Theft Over as it is the least frequent crime type
+
 ```{r}
 theft_over_rows<-dataset[dataset$mci_category == 'Theft Over',]
 theft_over_offence<-unique(na.omit(theft_over_rows$offence))
@@ -44,21 +98,25 @@ theft_over_offence[2]
 counts<-tabulate(match(theft_over_rows$offence, theft_over_offence))
 #par(mar = c(10, 4, 10, 1)) 
 barplot(counts, main = "Total for different categories of Theft Over ", names.arg = theft_over_offence, xlab = "Category type", ylab = "Total number", col = "blue", las = 2)
+library(ggplot2)
+library(scales)
 df<-data.frame(counts,theft_over_offence)
-p<-ggplot(data=df, aes(x=theft_over_offence, y=counts,fill=counts))+geom_bar(stat="identity")  +scale_x_discrete(labels = wrap_format(10))+geom_text(aes(label = counts), vjust = 0)
+p<-ggplot(data=df, aes(x=theft_over_offence, y=counts,fill=counts))+geom_bar(stat="identity")  +scale_x_discrete(labels = wrap_format(10))+geom_text(aes(label = counts), vjust = 0)+ggtitle(label="Total for different categories of Theft Over")+xlab(label="Category Type")+ylab("count")
 p
 ```
+Most frequent Category of Auto theft
 ```{r}
 theft_over_rows<-dataset[dataset$mci_category == 'Auto Theft',]
 theft_over_offence<-unique(na.omit(theft_over_rows$offence))
 theft_over_offence
 ```
 Assault insights
+Total crimes for different categories of Assault as it is the most frequent category
 
 ```{r}
 theft_over_rows<-dataset[dataset$mci_category == 'Assault',]
 theft_over_offence<-unique(na.omit(theft_over_rows$offence))
-theft_over_offence[2]
+theft_over_offence
 counts<-tabulate(match(theft_over_rows$offence, theft_over_offence))
 #par(mar = c(10, 4, 10, 1)) 
 barplot(counts, main = "Total for different categories of Assault", names.arg = theft_over_offence, 
@@ -69,7 +127,9 @@ library(ggplot2)
 library(scales)
 df <- data.frame(counts, theft_over_offence)
 options(repr.plot.width = 500, repr.plot.height =3)
-p<-ggplot(data=df, aes(x=theft_over_offence, y=counts,fill=counts))+geom_bar(stat="identity")  +scale_x_discrete(labels = wrap_format(5))+geom_text(aes(label = counts), vjust = 0)
+theme_update(plot.title = element_text(hjust = 0.5))
+p<-ggplot(data=df, aes(x=theft_over_offence, y=counts,fill=counts))+geom_bar(stat="identity")  +scale_x_discrete(labels = wrap_format(5))+geom_text(aes(label = counts), vjust = 0)+ggtitle(label="Total for different categories of Assault")+xlab(label="Category Type")+ylab("count")
+
 p
 ```
 
@@ -81,6 +141,7 @@ Waterfront Communities-The Island is the most unsafe place
   Neighbour <- unique(na.omit(dataset$Neighbourhood))
 
   most_dangerous_n<-Neighbour[which.max(tabulate(match(dataset$Neighbourhood, Neighbour)))]
+  most_dangerous_n
 ```
 
 Waterfront Communities-The Island insights
@@ -94,40 +155,99 @@ pie(c(counts),labels=paste(neighbor_crimes,round(100*counts/sum(counts),0),"%"),
 Least Dangerous neighborhood analysis
 ```{r}
  least_dangerous_n<-Neighbour[which.min(tabulate(match(dataset$Neighbourhood, Neighbour)))]
+least_dangerous_n
+```
+
+```{r}
 neighbor_analysis<-dataset[dataset$Neighbourhood == least_dangerous_n,]
 neighbor_crimes<-unique(na.omit(neighbor_analysis$mci_category))
 counts<-tabulate(match(neighbor_analysis$mci_category, neighbor_crimes))
 typeof(counts)
 pie(c(counts),labels=paste(neighbor_crimes,round(100*counts/sum(counts),0),"%"),col=c("blue","red","yellow","green","pink","magenta","gray"),main=paste("Crime Analysis",least_dangerous_n)) 
 ```
-Crime Rate over Years from 2014-2022
+Crime Rate over Years 1966-2022
 As the graph shows the crime rate kept increasing from 2014 till 2019 
 2019 was the peak
 then the rate dropped until now, this means that the police station implemented better security precautions
 ```{r}
-years <- unique(na.omit(dataset$reportedyear))
-years[which.max(tabulate(match(dataset$reportedyear, years)))]
+years <- unique(na.omit(dataset$occurrenceyear))
+years[which.max(tabulate(match(dataset$occurrenceyear, years)))]
 
-count<-tabulate(match(dataset$reportedyear, years))
-plot(count,type = "o", col = "red", xlab = "Years", ylab = "Crime Number",
-     main = "Crimes rate across the years", x=years)
+count<-tabulate(match(dataset$occurrenceyear, years))
+
+
+library(ggplot2)
+#ggplot(mapping= aes(x=months, y=count, group=0)) +geom_line()+geom_point()+geom_line()+ggtitle("Crimes across all months")
+# Second variable
+
+val<-data.frame(years,count)
+val
+theme_update(plot.title = element_text(hjust = 0.5))
+ggplot(data=val, aes(x=years, y=count, group=2)) +geom_line()+ggtitle(label="Crime Rates over the years\n 1966-2022")
 ```
 Crime rate analysis of months
 ```{r}
-months <- unique(na.omit(dataset$reportedmonth))
+months <- unique(na.omit(dataset$occurrencemonth))
 months
 
-count<-tabulate(match(dataset$reportedmonth, months))
+count<-tabulate(match(dataset$occurrencemonth, months))
 count
 #plot(y=count,type = "o", col = "red", xlab = "Years", ylab = "Rain fall", main = "Crimes rate across months of all years", x=months,xlim=c(1,12))
 
 library(ggplot2)
 #ggplot(mapping= aes(x=months, y=count, group=0)) +geom_line()+geom_point()+geom_line()+ggtitle("Crimes across all months")
 # Second variable
-plot(y=count,type = "o", col = "red", xlab = "Months", ylab = "Crime Number",
-     main = "Crimes rate across the years", x=c(1,2,3,4,5,6,7,8,9,10,11,12))
+levels(factor(dataset$occurrencemonth))
 
-# #Now the p contains a plot 
+val<-data.frame(months,count)
+theme_update(plot.title = element_text(hjust = 0.5))
+ggplot(data=val, aes(x=months, y=count, group=1)) +geom_line()+
+  geom_point()+xlim(1, 12)+scale_x_discrete(limits=(1:12))+ggtitle(label="Total number of crimes per month")
+```
+
+Time difference between occurence and reporting
+```{r}
+
+s <-aggregate(x= difftime(dataset$reporteddate, dataset$occurrencedate, units = "days") ,by = list(dataset$mci_categor),FUN = mean,na.rm=TRUE)
+
+mean_time_difference<-data.frame(s)
+mean_time_difference
+mean_num<-as.numeric(mean_time_difference$x)
+pie(c(mean_num),labels=paste(mean_time_difference$Group.1,round((mean_num),0),"days"),col=c("blue","red","yellow","green","pink","magenta","gray"),main=paste("Time difference between occurence and reporting")) 
+```
+insights on premises
+We calculated the most frequent premises type in which each category of crime occurs
+```{r}
+
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+t<-aggregate(x=dataset$premises_type  ,by = list(dataset$mci_category),FUN = Mode)
+t
+
+```
+Day of the week on which the most number of crimes occur
+we calculated the most frequent day on which each type of crime occured
+we also represented the frequency of crimes per days of the week using a bar chart
+```{r}
+
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+day <- unique(na.omit(dataset$occurrencedayofweek))
+day[1]
+count<-tabulate(match(dataset$occurrencedayofweek, day))
+count
+library(ggplot2)
+df<-data.frame(day,count)
+theme_update(plot.title = element_text(hjust = 0.5))
+p<-ggplot(data=df, aes(x=day, y=count,fill=count))+geom_bar(stat="identity")  +geom_text(aes(label = count), vjust = 0)+ggtitle(label="Total number of crimes per days of the week")+xlab(label="days")+ylab("count")
+p
+days<-aggregate(x=dataset$occurrencedayofweek  ,by = list(dataset$mci_category),FUN = Mode)
+days
 
 ```
 
