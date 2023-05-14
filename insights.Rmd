@@ -9,7 +9,7 @@ output: html_notebook
 rm(list=ls())
 ls()
 
-setwd(getwd()) 
+setwd("F:/Senior-2-Spring/Big-Data/Project-Repo/Big-Data-CrimeAnalysis-R-Hadoop") 
 ```
 
 load csv
@@ -66,8 +66,19 @@ dataset$occurrencemonth[which(dataset$occurrencemonth=="December")] <- "12"
 dataset$occurrencemonth <- as.numeric(dataset$occurrencemonth)
 levels(factor(dataset$occurrencemonth))
 
-moode <- unique(na.omit(dataset$occurrencedayofweek))
-dataset$occurrencedayofweek[(dataset$occurrencedayofweek == "")] <- moode[which.max(tabulate(match(dataset$occurrencedayofweek, moode)))]
+
+
+week_day<-c(dataset$occurrencedate[dataset$occurrencedayofweek == ""])
+week_day
+dataset$occurrencedayofweek[(dataset$occurrencedayofweek == "")] <-strftime(substr(week_day,1,10), format = "%A")
+dataset$occurrencedayofweek[(dataset$occurrencedayofweek == "Friday    ")]<-"Friday"
+dataset$occurrencedayofweek[(dataset$occurrencedayofweek == "Monday    ")]<-"Monday"
+dataset$occurrencedayofweek[(dataset$occurrencedayofweek == "Saturday  ")]<-"Saturday"
+dataset$occurrencedayofweek[(dataset$occurrencedayofweek == "Sunday    ")]<-"Sunday"
+dataset$occurrencedayofweek[(dataset$occurrencedayofweek == "Thursday  ")]<-"Thursday"
+dataset$occurrencedayofweek[(dataset$occurrencedayofweek == "Tuesday   ")]<-"Tuesday"
+dataset$occurrencedayofweek[(dataset$occurrencedayofweek == "Wednesday ")]<-"Wednesday"
+levels(factor(dataset$occurrencedayofweek))
 ```
 
 insights
